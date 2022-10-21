@@ -6,7 +6,6 @@ import { Loading } from 'notiflix/build/notiflix-loading-aio';
 import { PixabayAPI, PixabayAPI } from './js/fetchPixabay';
 import { createMarkup } from './js/createMarkup';
 import { refs, notifyOptions, lightbox } from './js/refs';
-import './css/gallery.css';
 
 const pixabay = new PixabayAPI();
 
