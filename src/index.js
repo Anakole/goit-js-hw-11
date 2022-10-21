@@ -5,16 +5,10 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { Loading } from 'notiflix/build/notiflix-loading-aio';
 import { PixabayAPI, PixabayAPI } from './js/fetchPixabay';
 import { createMarkup } from './js/createMarkup';
-import { refs } from './js/refs';
+import { refs, notifyOptions, lightbox } from './js/refs';
 import './css/gallery.css';
 
 const pixabay = new PixabayAPI();
-
-let lightbox = new SimpleLightbox('.photo-card a', {
-  captionType: 'alt',
-  captionsData: 'alt',
-  captionDelay: 250,
-});
 
 const handleSubmit = async e => {
   e.preventDefault();
@@ -26,8 +20,9 @@ const handleSubmit = async e => {
   const query = searchQuery.value.trim().toLowerCase();
 
   if (!query) {
-    return Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
+    return Notify.info(
+      'Sorry, there are no images matching your search query. Please try again.',
+      notifyOptions
     );
   }
 
@@ -39,7 +34,10 @@ const handleSubmit = async e => {
     const { hits, total } = await pixabay.getImages();
 
     if (hits.length === 0) {
-      Notify.info(`No pictures were found for your query ${query}.`);
+      Notify.failure(
+        `No pictures were found for your query ${query}.`,
+        notifyOptions
+      );
       return;
     }
 
@@ -56,7 +54,7 @@ const handleSubmit = async e => {
       refs.loadMoreBtn.classList.remove('is-hidden');
     }
   } catch (error) {
-    Notify.failure(error.message, 'Something went wrong...');
+    Notify.failure(error.message, 'Something went wrong...', notifyOptions);
     clearPage();
   } finally {
     Loading.remove();
@@ -72,14 +70,17 @@ const loadMore = async () => {
 
     if (!pixabay.isShowLoadMore) {
       refs.loadMoreBtn.classList.add('is-hidden');
-      Notify.failure(
-        "We're sorry, but you've reached the end of search results."
+      Notify.info(
+        "We're sorry, but you've reached the end of search results.",
+        {
+          position: 'right-bottom',
+        }
       );
     }
     const markup = createMarkup(hits);
     refs.list.insertAdjacentHTML('beforeend', markup);
   } catch (error) {
-    Notify.failure(error.message, 'Something went wrong...');
+    Notify.failure(error.message, 'Something went wrong...', notifyOptions);
     clearPage();
   } finally {
     Loading.remove();
